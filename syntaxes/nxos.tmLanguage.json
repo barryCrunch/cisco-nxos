@@ -1,0 +1,109 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "Cisco NXOS",
+	"patterns": [
+		{
+			"include": "#keywords"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#router"
+		},
+		{
+			"include": "#username"
+		},
+		{
+			"include": "#ip_address"
+		},
+		{
+			"include": "#subnet_mask"
+		},
+		{
+			"include": "#wildcard_mask"
+		}
+	],
+	"repository": {
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.nxos",
+				"match": "\\b(if|while|for|return|bgp)\\b"
+			}]
+		},
+		"strings": {
+			"name": "string.quoted.double.nxos",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.nxos",
+					"match": "\\\\."
+				}
+			]
+		},
+		"router": {
+			"begin": "^(router)(?=\\s)",
+			"end": "^(!|\\n\\n|exit)",
+			"beginCaptures": {
+				"1": { "name": "constant.language.nxos"}
+			},
+			"endCaptures": {
+				"1": {"name": "comment.documenation.nxos"}
+			},
+			"patterns": [{
+				"name": "keyword.other.archive",
+				"match": "\\s(bgp|ospf|isis|rip|eigrp|router-id|password|prefix-list|route-map|soft-reconfiguration|ebgp-multihop|route-reflector-client|next-hop-self|default-originate|in|out|graceful-restart|nsf|default-information|originate|restart-time|metric-type|subnets|stalepath-time|version|ipv4|ipv6|vpnv4|mask|vrf|remote-as|update-source|neighbor|redistribute|auto-summary|activate|send-community|synchronization|log-neighbor-changes|net|area|network|log-adjacency-changes|peer-group|timers)(?=\\s)"
+			},
+			{
+				"name": "constant.language",
+				"match": "\\s(address-family|exit-address-family)(?=\\s)"
+			},
+			{
+				"include": "#ip_address"
+			},
+			{
+				"include": "#subnet_mask"
+			},
+			{
+				"include": "#wildcard_mask"
+			}
+		]
+		},
+		"username": {
+			"begin": "^(username|user)\\s",
+			"end": "$",
+			"beginCaptures": {
+				"1": { "name": "constant.language.nxos"}
+			},
+			"patterns": [{
+				"name": "keyword.other.clock",
+				"match": "(secret|privilege|password|role)\\s"
+			},
+			{
+				"name": "support.type.property-name.nxos",
+				"match": "(network-admin)\\s"
+			}]
+		},
+		"ip_address": {
+			"patterns": [{
+					"name": "support.function.nxos",
+					"match": "\\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(/\\d+)?\\b"
+				}]
+		},
+		"wildcard_mask": {
+			"patterns": [{
+					"name": "string.regexp.nxos",
+					"match": "\\s0\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}[\/\\d{1,2}]*"
+				}]
+		},
+		"subnet_mask": {
+			"patterns": [{
+					"name": "string.regexp.nxos",
+					"match": "\\s255\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"
+				}]
+		}
+		
+	},
+	"scopeName": "source.nxos"
+}

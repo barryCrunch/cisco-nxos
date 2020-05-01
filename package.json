@@ -1,0 +1,25 @@
+{
+    "name": "cisco-nxos",
+    "displayName": "cisco-nxos",
+    "description": "Syntax Highlighting for Cisco NXOS Configuration Files",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.44.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "nxos",
+            "aliases": ["Cisco NXOS", "nxos"],
+            "extensions": [".nxos"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "nxos",
+            "scopeName": "source.nxos",
+            "path": "./syntaxes/nxos.tmLanguage.json"
+        }]
+    }
+}
