@@ -3,12 +3,6 @@
 	"name": "Cisco NXOS",
 	"patterns": [
 		{
-			"include": "#keywords"
-		},
-		{
-			"include": "#strings"
-		},
-		{
 			"include": "#router"
 		},
 		{
@@ -22,23 +16,134 @@
 		},
 		{
 			"include": "#wildcard_mask"
+		},
+		{
+			"include": "#description"
+		},
+		{
+			"include": "#route_map"
+		},
+		{
+			"include": "#access_list"
+		},
+		{
+			"include": "#vlan"
+		},
+		{
+			"include": "#prefix_list"
+		},
+		{
+			"include": "#test"
+		},
+		{
+			"include": "#feature"
+		},
+		{
+			"include": "#ip"
+		},
+		{
+			"include": "#no"
+		},
+		{
+			"include": "#tacacs-server"
 		}
 	],
 	"repository": {
-		"keywords": {
-			"patterns": [{
-				"name": "keyword.control.nxos",
-				"match": "\\b(if|while|for|return|bgp)\\b"
-			}]
-		},
-		"strings": {
-			"name": "string.quoted.double.nxos",
-			"begin": "\"",
-			"end": "\"",
+		"feature": {
+			"begin": "^(feature\\s|feature-set\\s)",
+			"end": "$",
+			"beginCaptures": {
+				"1": {"name": "support.function.nxos"}
+			},
 			"patterns": [
 				{
-					"name": "constant.character.escape.nxos",
-					"match": "\\\\."
+					"match": "\\b(\\S+)$",
+					"name": "keyword.nxos"
+				}
+			]
+		},
+		"ip": {
+			"begin": "^(ip\\s)",
+			"end": "$",
+			"beginCaptures": {
+				"1": {"name": "support.function.nxos"}
+			},
+			"patterns":[
+				{
+					"match": "(domain-name|forward-protocol|as-path|source|destination|version|ftp|username|password|flow-export|default-gateway|tacacs|sla|enable|tcp|path-mtu-discovery|flow-cache|bootp|lookup|multicast|hardware-switching|replication-mode|icmp|rate-limit|unreachable|authentication|timeout-policy|idle|life|local|pool|dhcp|excluded-address|use|connected|pim|rp-address|multicast-routing|source-route|vrf|cef|name-server|domain|name|telnet|source-interface|standard|extended|http|server|secure-server|route|subnet-zero|classless|route|global)(?=\\s)",
+					"name": "keyword.nxos"
+				}
+			] 
+		},
+		"no": {
+			"begin": "^(no\\s.*)",
+			"end": "$",
+			"beginCaptures": {
+				"1": {"name": "variable.language"}
+			}
+		},
+		"tacacs-server": {
+			
+		},
+		"vlan": {
+			"begin": "^(vlan\\s)([0-9]+$)",
+			"end": "^(!|\\n)",
+			"beginCaptures": {
+				"1": {"name": "support.constant"},
+				"2": {"name": "keyword.nxos"}
+			},
+			"endCaptures": {
+				"1": {"name": "comment.line"}
+			},
+			"patterns": [
+				{
+					"match": "name",
+					"name": "support.function.nxos"
+				},
+				{
+					"match": "\\b(\\S+)$",
+					"name": "entity.name"
+				},
+				{
+					"include": "#vlan"
+				}
+			]
+		},
+		"prefix_list":
+		{
+			"begin": "^(ip prefix-list\\s)(\\b\\S+\\b)",
+			"end": "($)",
+			"beginCaptures": {
+				"1": {"name": "support.function"},
+				"2": {"name": "entity.name"}
+			}
+		},
+		"access_list": {
+			"begin": "^(ip\\s)(access-list\\s)(\\w*)",
+			"end": "^(!|\\n)",
+			"beginCaptures": {
+				"1": {"name":"support.function.nxos"},
+				"2": {"name": "constant.language.nxos"},
+				"3": {"name":"keyword.nxos"}
+			},
+			"endCaptures": {
+				"1": {"name":"comment.line.double-slash"}
+			},
+			"patterns": [
+				{
+					"match": "(extended|compiled|udp|esp|tcp|icmp|ip|eq|range)\\s",
+					"name":"keyword.nxos"
+				},
+				{
+					"match": "(permit)\\s",
+					"name":"string.quoted.double.nxos"
+				},
+				{
+					"match": "(deny)\\s",
+					"name":"entity.other.inherited-class.nxos"
+				},
+				{
+					"include": "#ip_address"
 				}
 			]
 		},
@@ -69,6 +174,40 @@
 				"include": "#wildcard_mask"
 			}
 		]
+		},
+		"route_map": {
+			"patterns": [
+				{
+					"begin": "^(route-map)",
+					"end": "^(!|\\n)",
+					"beginCaptures": {
+						"1": {"name": "constant.language.nxos"},
+						"2": {"name": "keyword.other"}
+					},
+					"endCaptures": {
+						"1": {"name": "punctuation.definition.comment.nxos"}
+					},
+					"patterns": [
+						{
+							"match": "\\s(permit|deny|match|set|ip|next-hop|as-path|prefix-list|community|local-preference|address|dscp)(?=\\s)",
+							"name": "keyword.other.nxos"
+						},
+						{
+							"match": "^ip",
+							"name": "keyword.other.acl"
+						},
+						{
+							"include": "#ip_address"
+						},
+						{
+							"include": "#subnet_mask"
+						},
+						{
+							"include": "#description"
+						}
+					]
+				}
+			]
 		},
 		"username": {
 			"begin": "^(username|user)\\s",
@@ -102,8 +241,182 @@
 					"name": "string.regexp.nxos",
 					"match": "\\s255\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}"
 				}]
+		},
+		"description": {
+			"patterns": [{
+					"begin": "^(description|!|remark)(?=\\s)",
+					"end": "$",
+					"beginCaptures": {
+						"1": {"name": "punctuation.definition.comment.nxos"}
+					},
+					"patterns": [
+						{
+							"match": "(.*)",
+							"name": "punctuation.definition.comment.nxos"
+						}
+					]
+			}]
+		},
+		"test": {
+			"patterns": [
+				{
+					"name": "keyword",
+					"match": "keyword"
+				},
+				{
+					"name": "keyword.control",
+					"match": "keyword.control"
+				},
+				{
+					"name": "keyword.operator",
+					"match": "keyword.operator"
+				},
+				{
+					"name": "keyword.other",
+					"match": "keyword.other"
+				},
+				{
+					"name":"comment.block",
+					"match": "comment.block"
+				},
+				{
+					"name": "comment.line",
+					"match": "comment.line"
+				},
+				{
+					"name": "constant.numeric",
+					"match": "constant.numeric"
+				},
+				{
+					"name": "constant.character",
+					"match": "constant.character"
+				},
+				{
+					"name": "constant.language",
+					"match": "constant.language"
+				},
+				{
+					"name": "constant.other",
+					"match": "constant.other"
+				},
+				{
+					"name": "entity.name.function",
+					"match": "entity.name.function"
+				},
+				{
+					"name": "entity.name.type",
+					"match": "entity.name.type"
+				},
+				{
+					"name": "entity.name.tag",
+					"match": "entity.name.tag"
+				},
+				{
+					"name": "entity.name.section",
+					"match": "entity.name.section"
+				},
+				{
+					"name": "entity.name",
+					"match": "entity.name"
+				},
+				{
+					"name": "entity.other",
+					"match": "entity.other"
+				},
+				{
+					"name":"entity.other.attribute-name",
+					"match": "entity.other.attribute-name"
+				},
+				{
+					"name":"entity.other.inherited-class",
+					"match": "entity.other.inherited-class"
+				},
+				{
+					"name": "invalid",
+					"match": "invalid"
+				},
+				{
+					"name":"markup",
+					"match": "markup"
+				},
+				{
+					"name":"markup.underline",
+					"match": "markup.underline"
+				},
+				{
+					"name":"markup.bold",
+					"match": "markup.bold"
+				},
+				{
+					"name":"markup.heading",
+					"match": "markup.heading"
+				},
+				{
+					"name":"markup.italic",
+					"match": "markup.italic"
+				},
+				{
+					"name":"markup.quote",
+					"match": "markup.quote"
+				},
+				{
+					"name":"markup.raw",
+					"match": "markup.raw"
+				},
+				{
+					"name":"markup.other",
+					"match": "markup.other"
+				},
+				{
+					"name":"meta",
+					"match": "meta"
+				},
+				{
+					"name":"support.type",
+					"match": "support.type"
+				},
+				{
+					"name":"support.class",
+					"match": "support.class"
+				},
+				{
+					"name":"support.function",
+					"match": "support.function"
+				},
+				{
+					"name":"support.constant",
+					"match": "support.constant"
+				},
+				{
+					"name":"support.variable",
+					"match": "support.variable"
+				},
+				{
+					"name":"support.other",
+					"match": "support.other"
+				},
+				{
+					"name": "variable.parameter",
+					"match": "variable.parameter"
+				},
+				{
+					"name": "variable.language",
+					"match": "variable.language"
+				},
+				{
+					"name":"variable.other",
+					"match": "variable.other"
+				},
+				{
+					"name":"storage.type",
+					"match": "storage.type"
+				},
+				{
+					"name":"storage.modifier",
+					"match": "storage.modifier"
+				}
+			]
 		}
-		
 	},
 	"scopeName": "source.nxos"
 }
